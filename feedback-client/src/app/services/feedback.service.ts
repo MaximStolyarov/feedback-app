@@ -6,7 +6,7 @@ import { FeedbackRequest, FeedbackResponse, Theme } from '../models/message.mode
 @Injectable({ providedIn: 'root' })
 export class FeedbackService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'feedback-app-production-63c0.up.railway.app/api/messages';
+  private readonly apiUrl = 'https://feedback-app-production-63c0.up.railway.app/api/messages';
 
   getThemes(): Observable<Theme[]> {
     return this.http.get<Theme[]>(`${this.apiUrl}/themes`);
