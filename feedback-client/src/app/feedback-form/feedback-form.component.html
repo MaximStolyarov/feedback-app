@@ -1,0 +1,115 @@
+<!-- Окно успеха -->
+@if (submittedMessage()) {
+  <div class="result-card">
+    <h2>Сообщение отправлено!</h2>
+
+    <div class="result-field">
+      <span class="label">Имя:</span>
+      <span>{{ submittedMessage()!.contactName }}</span>
+    </div>
+    <div class="result-field">
+      <span class="label">Email:</span>
+      <span>{{ submittedMessage()!.contactEmail }}</span>
+    </div>
+    <div class="result-field">
+      <span class="label">Телефон:</span>
+      <span>{{ submittedMessage()!.contactPhone }}</span>
+    </div>
+    <div class="result-field">
+      <span class="label">Тема:</span>
+      <span>{{ submittedMessage()!.themeName }}</span>
+    </div>
+    <div class="result-field">
+      <span class="label">Сообщение:</span>
+      <span>{{ submittedMessage()!.text }}</span>
+    </div>
+    <div class="result-field">
+      <span class="label">Отправлено:</span>
+      <span>{{ submittedMessage()!.createdAt | date: 'dd.MM.yyyy HH:mm' }}</span>
+    </div>
+
+    <div class="actions">
+      <button class="btn-secondary" (click)="resetForm()">← Отправить ещё</button>
+    </div>
+  </div>
+}
+
+<!-- Форма -->
+@if (!submittedMessage()) {
+  <div class="form-wrapper">
+    <h2>Напишите нам</h2>
+
+    @if (serverError()) {
+      <div class="server-error">{{ serverError() }}</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+      <div class="field">
+        <label for="name">Ваше имя</label>
+        <input id="name" type="text" formControlName="name" placeholder="Иван Иванов" />
+        @if (showError('name')) {
+          <span class="error">Имя обязательно (не более 100 символов).</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="email">Ваш Email</label>
+        <input id="email" type="email" formControlName="email" placeholder="example@mail.ru" />
+        @if (showError('email')) {
+          @if (f['email'].errors?.['required']) {
+            <span class="error">Email обязателен.</span>
+          } @else {
+            <span class="error">Некорректный формат Email.</span>
+          }
+        }
+      </div>
+
+      <div class="field">
+        <label for="phone">Ваш телефон</label>
+        <input
+          id="phone"
+          type="tel"
+          formControlName="phone"
+          placeholder="+79001234567"
+          (input)="onPhoneInput($event)"
+        />
+        @if (showError('phone')) {
+          <span class="error">Введите телефон в формате +7XXXXXXXXXX.</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="themeId">Тема</label>
+        <select id="themeId" formControlName="themeId">
+          <option [ngValue]="null" disabled>Выберите тему</option>
+          @for (theme of themes; track theme.id) {
+            <option [ngValue]="theme.id">{{ theme.name }}</option>
+          }
+        </select>
+        @if (showError('themeId')) {
+          <span class="error">Выберите тему.</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="content">Ваше сообщение</label>
+        <textarea id="content" formControlName="content" rows="5" placeholder="Ваше сообщение..."></textarea>
+        @if (showError('content')) {
+          @if (f['content'].errors?.['required']) {
+            <span class="error">Сообщение обязательно.</span>
+          } @else if (f['content'].errors?.['minlength']) {
+            <span class="error">Минимум 5 символов.</span>
+          } @else {
+            <span class="error">Не более 2000 символов.</span>
+          }
+        }
+      </div>
+
+      <button type="submit" [disabled]="isLoading()">
+        {{ isLoading() ? 'Отправка...' : 'Отправить письмо' }}
+      </button>
+
+    </form>
+  </div>
+}
